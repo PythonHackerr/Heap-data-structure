@@ -1,4 +1,5 @@
 from matplotlib import pyplot
+from heap import Heap
 import random
 import time
 import gc
@@ -43,29 +44,25 @@ def measure_time(function, repeats):
     return sum(measures)/repeats
 
 
-def collect_stats_create(func, elements, steps=10, values_step=100, repeats=1):
+def collect_stats_create(n, elements, steps=10, values_step=100, repeats=1):
     measures = {}
+    def creat_heap_func(n, elements):
+        Heap(n, elements)
     for i in range(steps+1):
-        values = i*values_step
-        measures[values] = measure_time(
-            lambda: func(elements[:values]), repeats)
+        nvalues = i*values_step
+        measures[nvalues] = measure_time(
+            lambda: creat_heap_func(n, elements[:nvalues]), repeats)
     return measures
 
 
-def collect_stats_find(func, tree, elements, steps=10, values_step=100, repeats=1):
+def collect_stats_remove(n, numbers, steps=10, values_step=100, repeats=1):
     measures = {}
+    def remove_heap_root_func(heap, n):
+        for i in range(n):
+            heap.pop()
     for i in range(steps+1):
-        values = i*values_step
-        measures[values] = measure_time(
-            lambda: func(tree, elements, values), repeats)
-    return measures
-
-
-def collect_stats_remove(func_remove, func_add, tree, elements, steps=10, values_step=100, repeats=1):
-    measures = {}
-    for i in range(steps+1):
-        values = i*values_step
-        measures[values] = measure_time(
-            lambda: func_remove(tree, elements, values), repeats)
-        func_add(tree, elements, values)
+        heap = Heap(n, numbers)
+        ntimes = i*values_step
+        measures[ntimes] = measure_time(
+            lambda: remove_heap_root_func(heap, ntimes), repeats)
     return measures
